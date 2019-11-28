@@ -1,6 +1,7 @@
-import sys, graphviz, helper
+import sys, helper
 from sklearn import tree
 from sklearn.model_selection import train_test_split
+import graphviz
 
 
 def generate_sample_label(csvdir):
@@ -26,8 +27,9 @@ def train_plus_test(iteration, csvdir, classifier_type):
     clf = tree.DecisionTreeClassifier(criterion=classifier_type)
     clf = clf.fit(x_train, y_train)
 
-    dot_data = tree.export_graphviz(clf, out_file=None) 
-    graph = graphviz.Source(dot_data) 
+
+    dot_data = tree.export_graphviz(clf, out_file=None)
+    graph = graphviz.Source(dot_data)
     graph.render(classifier_type)
 
     count = 0
