@@ -81,13 +81,13 @@ group by f_playerID;
 
 
 #Get all stars stats and add to table smallerallstar
-drop table if exists smallerallstar;
-create table smallerallstar as
-SELECT `fielding`.`playerID` as allstar_playerID,
-    sum(`fielding`.`gameNum`) as allstar_gameNum,
-    sum(`fielding`.`GP`) as allstar_GP
-FROM `lahman2016`.`fielding`
-group by allstar_playerID;
+-- drop table if exists smallerallstar;
+-- create table smallerallstar as
+-- SELECT `fielding`.`playerID` as allstar_playerID,
+--     sum(`fielding`.`gameNum`) as allstar_gameNum,
+--     sum(`fielding`.`GP`) as allstar_GP
+-- FROM `lahman2016`.`fielding`
+-- group by allstar_playerID;
 
 -- alter table smallerfielding add constraint 'pk_smallerfielding' primary key (f_playerID);
 
@@ -98,27 +98,35 @@ group by allstar_playerID;
 drop table if exists career_record;
 create table career_record as 
 -- select * from smallerbatting left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID union select * from smallerbatting right join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID;
-SELECT t1.*
+SELECT t1.*, t2.award_count, t3.nomination_count
 FROM (
-select * 
-from smallerbatting 
-left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID 
-left join smallerfielding on smallerbatting.playerID = smallerfielding.f_playerID 
-union all
-select * from smallerpitching 
-left join smallerbatting on smallerbatting.playerID = smallerpitching.P_playerID
-left join smallerfielding on smallerpitching.P_playerID = smallerfielding.f_playerID
-where smallerbatting.playerID IS NULL
-union all
-select * from smallerfielding 
-left join smallerbatting on smallerbatting.playerID = smallerfielding.f_playerID
-left join smallerpitching on smallerpitching.P_playerID = smallerfielding.f_playerID
-where smallerbatting.playerID IS NULL AND smallerpitching.P_playerID IS NULL
+    select * 
+    from smallerbatting 
+    left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID 
+    left join smallerfielding on smallerbatting.playerID = smallerfielding.f_playerID 
+    union all
+    select * from smallerpitching 
+    left join smallerbatting on smallerbatting.playerID = smallerpitching.P_playerID
+    left join smallerfielding on smallerpitching.P_playerID = smallerfielding.f_playerID
+    where smallerbatting.playerID IS NULL
+    union all
+    select * from smallerfielding 
+    left join smallerbatting on smallerbatting.playerID = smallerfielding.f_playerID
+    left join smallerpitching on smallerpitching.P_playerID = smallerfielding.f_playerID
+    where smallerbatting.playerID IS NULL AND smallerpitching.P_playerID IS NULL
 ) as t1
 LEFT JOIN (
-    SELECT playerID, count(playerID) as count
+    SELECT playerID, count(playerID) as award_count
     FROM awardsplayers
-) ON t1.playerID=awardsplayers.playerID
+) as t2 ON t1.playerID=t2.playerID
+LEFT JOIN (
+    SELECT playerID, count(playerID) as nomination_count
+    FROM halloffame
+) as t3 ON t1.playerID=t3.playerID
+LEFT JOIN (
+    SELECT playerID, count(playerID) as allstar_count
+    FROM allstarfull
+) as t4 ON t1.playerID=t4.playerID
 ;
 
 
