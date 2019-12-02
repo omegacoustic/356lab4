@@ -39,14 +39,39 @@ def train_plus_test(iteration, csvdir, classifier_type):
     graph = graphviz.Source(dot_data)
     graph.render(classifier_type)
 
+    count = 0
+    true_pos = 0
+    false_pos = 0
+    true_neg = 0
+    false_neg = 0
+    predictions = []
 
     predictions = []
     # predict
     for test_sample in x_test:
         test_result = clf.predict([test_sample])
-        predictions.append(test_result)
-
     
+        if y_test[count]==1:
+            if test_result[0]==1:
+                true_pos += 1
+            else:
+                false_neg += 1
+        else:
+            if test_result[0]==1:
+                true_neg += 1
+            else:
+                false_pos += 1
+        predictions.append(test_result)
+        count += 1
+
+    print("True positives: {}".format(true_pos))
+    print("False positives: {}".format(false_pos))
+    print("True negatives: {}".format(true_neg))
+    print("False negatives: {}".format(false_neg))
+    print("(recall, precision): ({}, {})".format(true_pos/(true_pos+false_pos), true_pos/(true_pos+false_neg)))
+
+    helper.print_prediction(iteration, y_test, predictions, classifier_type)
+
     helper.print_prediction(iteration, y_test, predictions, classifier_type)
   
 
