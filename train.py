@@ -2,7 +2,8 @@ import sys, helper
 from sklearn import tree
 from sklearn.model_selection import train_test_split
 import graphviz
-
+from sklearn.metrics import confusion_matrix
+import numpy as np
 
 def generate_sample_label(csvdir):
     samples = []
@@ -27,27 +28,29 @@ def train_plus_test(iteration, csvdir, classifier_type):
     clf = tree.DecisionTreeClassifier(criterion=classifier_type)
     clf = clf.fit(x_train, y_train)
 
+    y_predict = clf.predict(x_test)
+    conf_matrix = confusion_matrix(y_test, y_predict)
+    tn, fp, fn, tp = conf_matrix.ravel()
+    accuracy = (tp + tn) / (tn + fp + fn + tp)
+
+
 
     dot_data = tree.export_graphviz(clf, out_file=None)
     graph = graphviz.Source(dot_data)
     graph.render(classifier_type)
 
-    count = 0
-    correct = 0
-    predictions = []
 
+    predictions = []
     # predict
     for test_sample in x_test:
         test_result = clf.predict([test_sample])
-        if test_result[0] ==  y_test[count]:
-            correct += 1
         predictions.append(test_result)
-        count += 1
+
     
     helper.print_prediction(iteration, y_test, predictions, classifier_type)
   
-    accuracy = (correct/count)*100
-    return accuracy
+
+    return accuracy, conf_matrix
 
 def multi_iterate(iteration, classifier_type, csvdir):
     out = open("g19_DT_"+classifier_type+"_predictions.csv", 'w')
@@ -55,9 +58,12 @@ def multi_iterate(iteration, classifier_type, csvdir):
 
     accuracy = [0]*iteration
     for i in range(iteration):
-        accuracy[i] = train_plus_test(i, csvdir, classifier_type)
+        np.random.seed(123)
+        confusion_matrices = {}
+        accuracy[i],confusion_matrices["{0}-confusion-matrix-iteration-{1}".format(classifier_type, i)] = train_plus_test(i, csvdir, classifier_type)
 
     helper.print_accuracy(iteration, accuracy, classifier_type)
+    helper.generate_metrics(confusion_matrices)
     print("Average accuracy: ", sum(accuracy)/iteration, "Source csv: ", csvdir)
 
 if __name__ == "__main__":

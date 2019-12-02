@@ -50,3 +50,19 @@ def print_prediction(iteration, classification, prediction, classification_type)
 
     output.write(content)
     output.close
+
+def generate_metrics(confusion_matrices):
+    from matplotlib import pyplot as plt
+    labels = ['', 'elected', 'nominee']
+    for label, cm in confusion_matrices.items():
+        fig, ax = plt.subplots()
+        cax = ax.matshow(cm)
+        plt.title(label)
+        ax.set_xticklabels(labels)
+        ax.set_yticklabels(labels)
+        plt.xlabel('Predicted')
+        plt.ylabel('Sampled')
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                ax.text(j, i, cm[i, j], ha="center", va="center", color="black")
+        fig.savefig(label + '.png')
