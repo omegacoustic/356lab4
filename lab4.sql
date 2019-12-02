@@ -1,3 +1,5 @@
+#Create new table smaller hall of fame and add column to it called 'Classification'
+#Set Classification to 1 if that player was already inducted or not
 drop table if exists smallerhof;
 create table smallerhof as select * from HallOfFame;
 
@@ -20,8 +22,10 @@ and smallerhof.needed_note = '1st';
 END@@
 DELIMITER ;
 
+
 call createClassification();
 
+#Feature Extraction
 alter table smallerhof
 drop column votedBy,
 drop column ballots,
@@ -31,6 +35,7 @@ drop column inducted,
 drop column category,
 drop column needed_note;
 
+#Get batting stats and add to table smallerbatting
 drop table if exists smallerbatting;
 create table smallerbatting as
 select playerID, sum(G) AS B_G, sum(AB) AS B_AB, sum(R) AS B_R, sum(H) AS B_H, sum(2B) AS B_2B, sum(3B) AS B_3B, sum(HR) AS B_HR, sum(RBI) AS B_RBI, 
@@ -39,6 +44,7 @@ select playerID, sum(G) AS B_G, sum(AB) AS B_AB, sum(R) AS B_R, sum(H) AS B_H, s
 
 alter table smallerbatting add constraint `pk_smallerbatting` primary key (playerID);
 
+#Get pitching stats and add to table smallerpitching
 drop table if exists smallerpitching;
 create table smallerpitching as
 select playerID as P_playerID, sum(W) AS P_W, sum(L) AS P_L, sum(G) AS P_G, sum(GS) AS P_GS, sum(CG) AS P_CG, sum(SHO) AS P_SHO, sum(SV) AS P_SV, sum(IPOuts) AS P_IPOuts,
@@ -48,9 +54,55 @@ select playerID as P_playerID, sum(W) AS P_W, sum(L) AS P_L, sum(G) AS P_G, sum(
 
 alter table smallerpitching add constraint `pk_smallerpitching` primary key (p_playerID);
 
+-- SELECT 'TEST1';
+#Get fielding stats and add to table smallerfielding
+drop table if exists smallerfielding;
+create table smallerfielding as
+SELECT `fielding`.`playerID` as f_playerID,
+    -- sum(`fielding`.`yearID`),
+    -- sum(`fielding`.`stint`),
+    -- sum(`fielding`.`teamID`),
+    -- sum(`fielding`.`lgID`),
+    -- sum(`fielding`.`POS`) as f_POS,
+    sum(`fielding`.`G`) as f_G,
+    -- sum(`fielding`.`GS`) as f_GS,
+    -- sum(`fielding`.`InnOuts`) as f_InnOuts,
+    sum(`fielding`.`PO`) as f_PO,
+    sum(`fielding`.`A`) as f_A,
+    sum(`fielding`.`E`) as f_E,
+    sum(`fielding`.`DP`) as f_DP,
+    sum(`fielding`.`PB`) as f_PB,
+    sum(`fielding`.`WP`) as f_WP,
+    sum(`fielding`.`SB`) as f_SB,
+    sum(`fielding`.`CS`) as f_CS,
+    sum(`fielding`.`ZR`) as f_ZR
+FROM `lahman2016`.`fielding`
+group by f_playerID;
+-- SELECT 'TEST1';
+
+-- alter table smallerfielding add constraint 'pk_smallerfielding' primary key (f_playerID);
+
+
+
+#Combine pitching and batting stats into one table career_records
 drop table if exists career_record;
 create table career_record as 
-select * from smallerbatting left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID union select * from smallerbatting right join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID;
+-- select * from smallerbatting left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID union select * from smallerbatting right join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID;
+select * 
+from smallerbatting 
+left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID 
+left join smallerfielding on smallerbatting.playerID = smallerfielding.f_playerID 
+union all
+select * from smallerpitching 
+left join smallerbatting on smallerbatting.playerID = smallerpitching.P_playerID
+left join smallerfielding on smallerpitching.P_playerID = smallerfielding.f_playerID
+where smallerbatting.playerID IS NULL
+union all
+select * from smallerfielding 
+left join smallerbatting on smallerbatting.playerID = smallerfielding.f_playerID
+left join smallerpitching on smallerpitching.P_playerID = smallerfielding.f_playerID
+where smallerbatting.playerID IS NULL AND smallerpitching.P_playerID IS NULL
+;
 
 
 
