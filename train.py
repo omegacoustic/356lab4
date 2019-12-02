@@ -38,6 +38,7 @@ def train_plus_test(iteration, csvdir, classifier_type):
 
     # predict
     for test_sample in x_test:
+        print(test_sample)
         test_result = clf.predict([test_sample])
         if test_result[0] ==  y_test[count]:
             correct += 1

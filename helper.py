@@ -7,8 +7,7 @@ def turn_record_to_sample(row_record):
 
     samples = []
 
-    #represent leagueid with int
-    leagueid_dict = {"UA":1,"AL":2,"NL":3,"PL":4,"NA":5,"AA":6,"FL":7}
+
 
     #list of useless string
     gabage = ["NULL", "null", "\\N",""]
@@ -16,9 +15,10 @@ def turn_record_to_sample(row_record):
     for elem in elems[1:]:
         if elem in gabage:
             samples.append(-1)
-        elif not elem.isdigit():
-            samples.append(leagueid_dict.get(elem, -1))
+        elif elem[0].isalpha():
+            samples.append(-1)
         else:
+            elem = elem.split(".")[0]
             samples.append(int(elem))
 
     #return playerid, features, label
