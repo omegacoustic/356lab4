@@ -78,9 +78,21 @@ SELECT `fielding`.`playerID` as f_playerID,
     sum(`fielding`.`ZR`) as f_ZR
 FROM `lahman2016`.`fielding`
 group by f_playerID;
--- SELECT 'TEST1';
+
+
+#Get all stars stats and add to table smallerallstar
+drop table if exists smallerallstar;
+create table smallerallstar as
+SELECT `fielding`.`playerID` as allstar_playerID,
+    sum(`fielding`.`gameNum`) as allstar_gameNum,
+    sum(`fielding`.`GP`) as allstar_GP
+FROM `lahman2016`.`fielding`
+group by allstar_playerID;
 
 -- alter table smallerfielding add constraint 'pk_smallerfielding' primary key (f_playerID);
+
+
+-- SELECT 'TEST1';
 
 #Combine pitching and batting stats into one table career_records
 drop table if exists career_record;
