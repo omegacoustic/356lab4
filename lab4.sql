@@ -82,12 +82,12 @@ group by f_playerID;
 
 -- alter table smallerfielding add constraint 'pk_smallerfielding' primary key (f_playerID);
 
-
-
 #Combine pitching and batting stats into one table career_records
 drop table if exists career_record;
 create table career_record as 
 -- select * from smallerbatting left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID union select * from smallerbatting right join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID;
+SELECT t1.*
+FROM (
 select * 
 from smallerbatting 
 left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID 
@@ -102,6 +102,11 @@ select * from smallerfielding
 left join smallerbatting on smallerbatting.playerID = smallerfielding.f_playerID
 left join smallerpitching on smallerpitching.P_playerID = smallerfielding.f_playerID
 where smallerbatting.playerID IS NULL AND smallerpitching.P_playerID IS NULL
+) as t1
+LEFT JOIN (
+    SELECT playerID, count(playerID) as count
+    FROM awardsplayers
+) ON t1.playerID=awardsplayers.playerID
 ;
 
 
