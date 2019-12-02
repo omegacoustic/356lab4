@@ -11,7 +11,7 @@ def turn_record_to_sample(row_record):
     leagueid_dict = {"UA":1,"AL":2,"NL":3,"PL":4,"NA":5,"AA":6,"FL":7}
 
     #list of useless string
-    gabage = ["NULL", "null", ""]
+    gabage = ["NULL", "null", "\\N",""]
 
     for elem in elems[1:]:
         if elem in gabage:

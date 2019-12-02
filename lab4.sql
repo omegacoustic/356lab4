@@ -52,5 +52,15 @@ drop table if exists career_record;
 create table career_record as 
 select * from smallerbatting left join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID union select * from smallerbatting right join smallerpitching on smallerbatting.playerID = smallerpitching.P_playerID;
 
-select playerID,yearID,B_G,B_AB,B_R,B_H,B_2B,B_3B,B_HR,B_RBI,B_SB,B_CS,B_BB,B_SO,B_IBB,B_HBP,P_W,P_L,P_G,P_GS,P_CG,P_SHO,P_SV,P_IPOuts,P_H,P_ER,P_HR,P_BB,P_SO,P_BAOpp,P_ERA,P_IBB,P_WP,P_HBP,P_BK,P_BFP,P_GF,P_R,Classification
-from (select playerID, yearID, sum(Classification) >= 1 as Classification from smallerhof group by playerID, yearID) as therealhof left join career_record using (playerID);
+
+
+-- select playerID,yearID,B_G,B_AB,B_R,B_H,B_2B,B_3B,B_HR,B_RBI,B_SB,B_CS,B_BB,B_SO,B_IBB,B_HBP,P_W,P_L,P_G,P_GS,P_CG,P_SHO,P_SV,P_IPOuts,P_H,P_ER,P_HR,P_BB,P_SO,P_BAOpp,P_ERA,P_IBB,P_WP,P_HBP,P_BK,P_BFP,P_GF,P_R,Classification
+-- from 
+-- (
+--   select playerID, yearID, sum(Classification) >= 1 as Classification from smallerhof group by playerID, yearID 
+-- ) as realhof
+-- left join career_record using (playerID)
+-- INTO OUTFILE './source.csv'
+-- FIELDS TERMINATED BY ','
+-- ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n';
