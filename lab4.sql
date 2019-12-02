@@ -118,14 +118,17 @@ FROM (
 LEFT JOIN (
     SELECT playerID, count(playerID) as award_count
     FROM awardsplayers
+    GROUP BY playerID
 ) as t2 ON t1.playerID=t2.playerID
 LEFT JOIN (
     SELECT playerID, count(playerID) as nomination_count
     FROM halloffame
+    GROUP BY playerID
 ) as t3 ON t1.playerID=t3.playerID
 LEFT JOIN (
     SELECT playerID, count(playerID) as allstar_count
     FROM allstarfull
+    GROUP BY playerID
 ) as t4 ON t1.playerID=t4.playerID
 ;
 

@@ -16,6 +16,8 @@ FROM (
 ) as t1
 LEFT JOIN career_record ON t1.playerID=career_record.playerID
 '''
+# query = '''
+# '''
 
 results = pandas.read_sql_query(query, conn)
 results.to_csv("source.csv", index=False)
